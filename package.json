@@ -1,6 +1,6 @@
 {
   "name": "sea-lines",
-  "author": "MakeAwesomeHappen",
+  "author": "justinjhendrick",
   "version": "1.0.0",
   "keywords": ["pebble-app"],
   "private": true,
@@ -11,13 +11,10 @@
     "sdkVersion": "3",
     "enableMultiJS": true,
     "targetPlatforms": [
-      "aplite",
-      "basalt",
-      "chalk",
-      "diorite"
+      "basalt"
     ],
     "watchapp": {
-      "watchface": false
+      "watchface": true 
     },
     "messageKeys": [
       "dummy"
