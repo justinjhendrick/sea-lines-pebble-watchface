@@ -1,0 +1,3 @@
+build/
+.vscode
+.lock-waf_linux_build
