@@ -114,7 +114,7 @@ static void update_layer(Layer* layer, GContext* ctx) {
   }
 
   GRect bounds = layer_get_bounds(layer);
-  int vcr = min(bounds.size.h, bounds.size.w) / 2 - 2;
+  int vcr = min(bounds.size.h, bounds.size.w) / 2 - PBL_IF_ROUND_ELSE(4, 2);
   GPoint center = grect_center_point(&bounds);
   draw_bg(ctx, bounds, center, vcr);
   draw_ticks(ctx, bounds, center, vcr, now);
