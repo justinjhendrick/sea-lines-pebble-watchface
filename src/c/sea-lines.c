@@ -14,7 +14,7 @@ static Layer* s_layer;
 static char s_buffer[BUFFER_LEN];
 
 static void draw_bg(GContext* ctx, GRect bounds, GPoint center, int vcr) {
-  int width = 8;
+  int width = 4;
   int i = 0;
   int to_corner = 1414 * max(bounds.size.h, bounds.size.w) / 1000;
   for (int radius = to_corner; radius > width; radius -= width) {
@@ -62,9 +62,9 @@ static void draw_ticks(GContext* ctx, GRect bounds, GPoint center, int vcr, stru
     } else {
       graphics_context_set_stroke_color(ctx, COL_BEIGE);
       graphics_context_set_stroke_width(ctx, 3);
-      int text_size = 24;
+      int text_size = 18;
       int hour_text = (hour == 0) ? 12 : hour;
-      int half_width = DEG_TO_TRIGANGLE(10);
+      int half_width = DEG_TO_TRIGANGLE(8);
       bool flip = (hour_text > 3 && hour_text < 9);
       if (hour_text < 10) {
         draw_one_digit(ctx, hour_text, center, vcr - text_size, vcr, angle - half_width, angle + half_width, flip);
@@ -114,7 +114,7 @@ static void update_layer(Layer* layer, GContext* ctx) {
   }
 
   GRect bounds = layer_get_bounds(layer);
-  int vcr = min(bounds.size.h, bounds.size.w) / 2;
+  int vcr = min(bounds.size.h, bounds.size.w) / 2 - 1;
   GPoint center = grect_center_point(&bounds);
   draw_bg(ctx, bounds, center, vcr);
   draw_ticks(ctx, bounds, center, vcr, now);
