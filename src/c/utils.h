@@ -155,3 +155,90 @@ static void draw_text_botalign(GContext* ctx, const char* buffer, GRect bbox, GT
 static void draw_text_noalign(GContext* ctx, const char* buffer, GRect bbox, GTextAlignment align, bool bold) {
   draw_text_valign(ctx, buffer, bbox, align, bold, 3);
 }
+
+static void swap(GPoint* a, GPoint* b) {
+  GPoint tmp = *a;
+  *a = *b;
+  *b = tmp;
+}
+
+static void draw_one_digit(
+  GContext* ctx,
+  int digit,
+  GPoint center,
+  int inner_radius,
+  int outer_radius,
+  int left_angle,
+  int right_angle,
+  bool flip
+) {
+  GPoint bl = cartesian_from_polar_trigangle(center, inner_radius, left_angle);
+  GPoint bc = cartesian_from_polar_trigangle(center, inner_radius, (left_angle + right_angle) / 2);
+  GPoint br = cartesian_from_polar_trigangle(center, inner_radius, right_angle);
+
+  GPoint ml = cartesian_from_polar_trigangle(center, (inner_radius + outer_radius) / 2, left_angle);
+  GPoint mc = cartesian_from_polar_trigangle(center, (inner_radius + outer_radius) / 2, (left_angle + right_angle) / 2);
+  GPoint mr = cartesian_from_polar_trigangle(center, (inner_radius + outer_radius) / 2, right_angle);
+
+  GPoint tl = cartesian_from_polar_trigangle(center, outer_radius, left_angle);
+  GPoint tc = cartesian_from_polar_trigangle(center, outer_radius, (left_angle + right_angle) / 2);
+  GPoint tr = cartesian_from_polar_trigangle(center, outer_radius, right_angle);
+
+  if (flip) {
+    swap(&bl, &tr);
+    swap(&bc, &tc);
+    swap(&br, &tl);
+    swap(&mr, &ml);
+  }
+
+  if (digit == 0) {
+    graphics_draw_line(ctx, tl, tr);
+    graphics_draw_line(ctx, tr, br);
+    graphics_draw_line(ctx, br, bl);
+    graphics_draw_line(ctx, bl, tl);
+  } else if (digit == 1) {
+    graphics_draw_line(ctx, tc, bc);
+  } else if (digit == 2) {
+    graphics_draw_line(ctx, tl, tr);
+    graphics_draw_line(ctx, tr, mr);
+    graphics_draw_line(ctx, mr, ml);
+    graphics_draw_line(ctx, ml, bl);
+    graphics_draw_line(ctx, bl, br);
+  } else if (digit == 3) {
+    graphics_draw_line(ctx, tl, tr);
+    graphics_draw_line(ctx, tr, br);
+    graphics_draw_line(ctx, mr, ml);
+    graphics_draw_line(ctx, br, bl);
+  } else if (digit == 4) {
+    graphics_draw_line(ctx, tl, ml);
+    graphics_draw_line(ctx, ml, mr);
+    graphics_draw_line(ctx, tr, br);
+  } else if (digit == 5) {
+    graphics_draw_line(ctx, tl, tr);
+    graphics_draw_line(ctx, tl, ml);
+    graphics_draw_line(ctx, ml, mr);
+    graphics_draw_line(ctx, mr, br);
+    graphics_draw_line(ctx, br, bl);
+  } else if (digit == 6) {
+    graphics_draw_line(ctx, tr, tl);
+    graphics_draw_line(ctx, tl, bl);
+    graphics_draw_line(ctx, bl, br);
+    graphics_draw_line(ctx, br, mr);
+    graphics_draw_line(ctx, mr, ml);
+  } else if (digit == 7) {
+    graphics_draw_line(ctx, tl, tr);
+    graphics_draw_line(ctx, tr, br);
+  } else if (digit == 8) {
+    graphics_draw_line(ctx, tl, tr);
+    graphics_draw_line(ctx, ml, mr);
+    graphics_draw_line(ctx, bl, br);
+    graphics_draw_line(ctx, tl, bl);
+    graphics_draw_line(ctx, tr, br);
+  } else if (digit == 9) {
+    graphics_draw_line(ctx, mr, ml);
+    graphics_draw_line(ctx, ml, tl);
+    graphics_draw_line(ctx, tl, tr);
+    graphics_draw_line(ctx, tr, br);
+    graphics_draw_line(ctx, br, bl);
+  }
+}

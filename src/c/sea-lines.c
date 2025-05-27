@@ -61,14 +61,17 @@ static void draw_ticks(GContext* ctx, GRect bounds, GPoint center, int vcr, stru
       format_day_of_week(s_buffer, BUFFER_LEN, now);
       draw_text_midalign(ctx, s_buffer, wday_bbox, GTextAlignmentCenter, false);
     } else {
-      // TODO: rotate hour numbers
-      graphics_context_set_text_color(ctx, COL_BEIGE);
-      snprintf(s_buffer, BUFFER_LEN, "%d", (hour == 0) ? 12 : hour);
-      GRect bbox = rect_from_midpoint(
-        cartesian_from_polar_trigangle(center, vcr - text_size / 4, angle),
-        GSize(text_size, text_size)
-      );
-      draw_text_midalign(ctx, s_buffer, bbox, GTextAlignmentCenter, true);
+      graphics_context_set_stroke_color(ctx, COL_BEIGE);
+      graphics_context_set_stroke_width(ctx, 3);
+      int hour_text = (hour == 0) ? 12 : hour;
+      int half_width = DEG_TO_TRIGANGLE(6);
+      bool flip = (hour_text > 3 && hour_text < 9);
+      if (hour_text < 10) {
+        draw_one_digit(ctx, hour_text, center, vcr - text_size, vcr, angle - half_width, angle + half_width, flip);
+      } else {
+        draw_one_digit(ctx, hour_text / 10, center, vcr - text_size, vcr, angle - half_width, angle, flip);
+        draw_one_digit(ctx, hour_text % 10, center, vcr - text_size, vcr, angle + 10, angle + half_width, flip);
+      }
     }
   }
 }
