@@ -33,7 +33,6 @@ static void draw_bg(GContext* ctx, GRect bounds, GPoint center, int vcr) {
 }
 
 static void draw_ticks(GContext* ctx, GRect bounds, GPoint center, int vcr, struct tm* now) {
-  int text_size = 30;
   for (int hour = 0; hour < 12; hour++) {
     int angle = hour * TRIG_MAX_ANGLE / 12;
     if (hour == 3) {
@@ -63,14 +62,15 @@ static void draw_ticks(GContext* ctx, GRect bounds, GPoint center, int vcr, stru
     } else {
       graphics_context_set_stroke_color(ctx, COL_BEIGE);
       graphics_context_set_stroke_width(ctx, 3);
+      int text_size = 24;
       int hour_text = (hour == 0) ? 12 : hour;
-      int half_width = DEG_TO_TRIGANGLE(6);
+      int half_width = DEG_TO_TRIGANGLE(10);
       bool flip = (hour_text > 3 && hour_text < 9);
       if (hour_text < 10) {
         draw_one_digit(ctx, hour_text, center, vcr - text_size, vcr, angle - half_width, angle + half_width, flip);
       } else {
         draw_one_digit(ctx, hour_text / 10, center, vcr - text_size, vcr, angle - half_width, angle, flip);
-        draw_one_digit(ctx, hour_text % 10, center, vcr - text_size, vcr, angle + 10, angle + half_width, flip);
+        draw_one_digit(ctx, hour_text % 10, center, vcr - text_size, vcr, angle, angle + half_width, flip);
       }
     }
   }
