@@ -86,7 +86,7 @@ static void draw_hour(GContext* ctx, GRect bounds, GPoint center, int vcr, struc
   graphics_draw_line(
     ctx,
     cartesian_from_polar_trigangle(center, -10, angle),
-    cartesian_from_polar_trigangle(center, vcr - 28, angle)
+    cartesian_from_polar_trigangle(center, 6 * vcr / 10, angle)
   );
   graphics_fill_circle(ctx, center, 6);
 }
@@ -101,7 +101,7 @@ static void draw_minute(GContext* ctx, GRect bounds, GPoint center, int vcr, str
   graphics_draw_line(
     ctx,
     cartesian_from_polar_trigangle(center, -8, angle),
-    cartesian_from_polar_trigangle(center, vcr - 10, angle)
+    cartesian_from_polar_trigangle(center, 9 * vcr / 10, angle)
   );
   graphics_fill_circle(ctx, center, 4);
 }
@@ -114,7 +114,7 @@ static void update_layer(Layer* layer, GContext* ctx) {
   }
 
   GRect bounds = layer_get_bounds(layer);
-  int vcr = min(bounds.size.h, bounds.size.w) / 2 - 1;
+  int vcr = min(bounds.size.h, bounds.size.w) / 2 - 2;
   GPoint center = grect_center_point(&bounds);
   draw_bg(ctx, bounds, center, vcr);
   draw_ticks(ctx, bounds, center, vcr, now);
