@@ -1,17 +1,14 @@
 #include <pebble.h>
 #include "utils.h"
+#include "config.h"
 
 #define DEBUG_TIME (false)
 #define BUFFER_LEN (10)
-#define COL_BG1   (GColorOxfordBlue)
-#define COL_BG2   (GColorLiberty)
-#define COL_HOUR  (GColorCeleste)
-#define COL_MIN   (GColorRajah)
-#define COL_BEIGE (GColorPastelYellow)
 
 static Window* s_window;
 static Layer* s_layer;
 static char s_buffer[BUFFER_LEN];
+static AppConfig s_config;
 
 static void draw_bg(GContext* ctx, GRect bounds, GPoint center, int vcr) {
   int width = 4;
@@ -19,9 +16,9 @@ static void draw_bg(GContext* ctx, GRect bounds, GPoint center, int vcr) {
   int to_corner = 1414 * max(bounds.size.h, bounds.size.w) / 1000;
   for (int radius = to_corner; radius > width; radius -= width) {
     if (i++ % 2 == 0) {
-      graphics_context_set_fill_color(ctx, COL_BG1);
+      graphics_context_set_fill_color(ctx, (&s_config)->bg1);
     } else {
-      graphics_context_set_fill_color(ctx, COL_BG2);
+      graphics_context_set_fill_color(ctx, (&s_config)->bg2);
     }
     graphics_fill_circle(ctx, center, radius);
     GRect r = (GRect) {
@@ -37,8 +34,8 @@ static void draw_ticks(GContext* ctx, GRect bounds, GPoint center, int vcr, stru
     int angle = hour * TRIG_MAX_ANGLE / 12;
     if (hour == 3) {
       // date of month
-      graphics_context_set_text_color(ctx, GColorBlack);
-      graphics_context_set_fill_color(ctx, COL_BEIGE);
+      graphics_context_set_text_color(ctx, gcolor_legible_over((&s_config)->date2));
+      graphics_context_set_fill_color(ctx, (&s_config)->date2);
       GSize date_size = GSize(20, 24);
       GRect date_bbox = rect_from_midpoint(
         cartesian_from_polar_trigangle(center, vcr - date_size.w / 2, angle),
@@ -49,8 +46,8 @@ static void draw_ticks(GContext* ctx, GRect bounds, GPoint center, int vcr, stru
       draw_text_midalign(ctx, s_buffer, date_bbox, GTextAlignmentCenter, true);
 
       // day of week
-      graphics_context_set_text_color(ctx, GColorBlack);
-      graphics_context_set_fill_color(ctx, GColorWhite);
+      graphics_context_set_text_color(ctx, gcolor_legible_over((&s_config)->date1));
+      graphics_context_set_fill_color(ctx, (&s_config)->date1);
       GSize wday_size = GSize(28, 24);
       GRect wday_bbox = rect_from_midpoint(
         cartesian_from_polar_trigangle(center, vcr - date_size.w - wday_size.w / 2, angle),
@@ -60,7 +57,7 @@ static void draw_ticks(GContext* ctx, GRect bounds, GPoint center, int vcr, stru
       format_day_of_week(s_buffer, BUFFER_LEN, now);
       draw_text_midalign(ctx, s_buffer, wday_bbox, GTextAlignmentCenter, false);
     } else {
-      graphics_context_set_stroke_color(ctx, COL_BEIGE);
+      graphics_context_set_stroke_color(ctx, (&s_config)->digits);
       graphics_context_set_stroke_width(ctx, 3);
       int text_size = 18;
       int hour_text = (hour == 0) ? 12 : hour;
@@ -78,8 +75,8 @@ static void draw_ticks(GContext* ctx, GRect bounds, GPoint center, int vcr, stru
 
 static void draw_hour(GContext* ctx, GRect bounds, GPoint center, int vcr, struct tm* now) {
   graphics_context_set_stroke_width(ctx, 5);
-  graphics_context_set_fill_color(ctx, COL_HOUR);
-  graphics_context_set_stroke_color(ctx, COL_HOUR);
+  graphics_context_set_fill_color(ctx, (&s_config)->hour);
+  graphics_context_set_stroke_color(ctx, (&s_config)->hour);
   int total_mins = 12 * 60;
   int current_mins = now->tm_hour * 60 + now->tm_min;
   int angle = current_mins * TRIG_MAX_ANGLE / total_mins;
@@ -93,8 +90,8 @@ static void draw_hour(GContext* ctx, GRect bounds, GPoint center, int vcr, struc
 
 static void draw_minute(GContext* ctx, GRect bounds, GPoint center, int vcr, struct tm* now) {
   graphics_context_set_stroke_width(ctx, 5);
-  graphics_context_set_stroke_color(ctx, COL_MIN);
-  graphics_context_set_fill_color(ctx, COL_MIN);
+  graphics_context_set_stroke_color(ctx, (&s_config)->min);
+  graphics_context_set_fill_color(ctx, (&s_config)->min);
   int total_mins = 60;
   int current_mins = now->tm_min;
   int angle = current_mins * TRIG_MAX_ANGLE / total_mins;
@@ -125,7 +122,7 @@ static void update_layer(Layer* layer, GContext* ctx) {
 static void window_load(Window* window) {
   Layer* window_layer = window_get_root_layer(window);
   GRect bounds = layer_get_bounds(window_layer);
-  window_set_background_color(s_window, COL_BG1);
+  window_set_background_color(s_window, (&s_config)->bg1);
   s_layer = layer_create(bounds);
   layer_set_update_proc(s_layer, update_layer);
   layer_add_child(window_layer, s_layer);
@@ -140,6 +137,7 @@ static void tick_handler(struct tm* now, TimeUnits units_changed) {
 }
 
 static void init(void) {
+  config_load(&s_config);
   s_window = window_create();
   window_set_window_handlers(s_window, (WindowHandlers) {
     .load = window_load,
@@ -147,9 +145,12 @@ static void init(void) {
   });
   window_stack_push(s_window, true);
   tick_timer_service_subscribe(DEBUG_TIME ? SECOND_UNIT : MINUTE_UNIT, tick_handler);
+  messaging_init(&s_config, window_get_root_layer(s_window));
 }
 
 static void deinit(void) {
+  config_save(&s_config);
+  messaging_deinit();
   window_destroy(s_window);
 }
 

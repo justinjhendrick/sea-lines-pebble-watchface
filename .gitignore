@@ -1,3 +1,4 @@
 build/
 .vscode
-.lock-waf_linux_build
+.lock-waf_*
+node_modules/

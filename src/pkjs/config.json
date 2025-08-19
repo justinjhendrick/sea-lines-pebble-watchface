@@ -1,0 +1,58 @@
+[
+  {
+    "type": "section",
+    "items": [
+      { 
+        "type": "heading", 
+        "defaultValue": "Watchface Customization" 
+      },
+      {
+        "type": "color",
+        "defaultValue": "000055",
+        "messageKey": "BG1",
+        "label": "Background"
+      },
+      {
+        "type": "color",
+        "defaultValue": "5555AA",
+        "messageKey": "BG2",
+        "label": "Secondary Background"
+      },
+      {
+        "type": "color",
+        "defaultValue": "FFFFFF",
+        "messageKey": "DATE1",
+        "label": "Day of the Week Background"
+      },
+      {
+        "type": "color",
+        "defaultValue": "FFFFAA",
+        "messageKey": "DATE2",
+        "label": "Day of the Month Background"
+      },
+      {
+        "type": "color",
+        "defaultValue": "FFFFAA",
+        "messageKey": "DIGITS",
+        "label": "Digits"
+      },
+      {
+        "type": "color",
+        "defaultValue": "AAFFFF",
+        "messageKey": "HOUR",
+        "label": "Hours Hand"
+      },
+      {
+        "type": "color",
+        "defaultValue": "FFAA55",
+        "messageKey": "MINUTE",
+        "label": "Minutes Hand"
+      }
+    ]
+  },
+  {
+    "type": "submit",
+    "defaultValue": "Save Settings"
+  }
+]
+
