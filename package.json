@@ -2,9 +2,15 @@
   "name": "sea-lines",
   "author": "justinjhendrick",
   "version": "1.1.0",
-  "keywords": ["pebble-watchface", "analog", "colorful"],
+  "keywords": [
+    "pebble-watchface",
+    "analog",
+    "colorful"
+  ],
   "private": false,
-  "dependencies": {},
+  "dependencies": {
+    "pebble-clay": "^1.0.4"
+  },
   "pebble": {
     "displayName": "Sea Lines",
     "uuid": "372b9a3f-a948-415d-a099-b4a84d0673a8",
@@ -16,10 +22,16 @@
       "emery"
     ],
     "watchapp": {
-      "watchface": true 
+      "watchface": true
     },
     "messageKeys": [
-      "dummy"
+      "BG1",
+      "BG2",
+      "DATE1",
+      "DATE2",
+      "DIGITS",
+      "HOUR",
+      "MIN"
     ],
     "resources": {
       "media": []
