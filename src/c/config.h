@@ -9,7 +9,7 @@ typedef struct {
   GColor date2;
   GColor digits;
   GColor hour;
-  GColor min;
+  GColor minute;
 } AppConfig;
 
 void config_load(AppConfig *config);
