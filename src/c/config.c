@@ -1,9 +1,12 @@
 #include "config.h"
 
+#define SETTINGS_VERSION_KEY 1
+
 static AppConfig *s_config;
 static Layer *s_layer;
 
 void config_load(AppConfig *config) {
+  // If we need a new version of settings, check SETTINGS_VERSION_KEY and migrate
   // Set default colors
   config->bg1 = GColorOxfordBlue;
   config->bg2 = GColorLiberty;
@@ -11,7 +14,7 @@ void config_load(AppConfig *config) {
   config->date2 = GColorPastelYellow;
   config->digits = GColorPastelYellow;
   config->hour = GColorCeleste;
-  config->min = GColorRajah;
+  config->minute = GColorRajah;
 
   // Load colors from storage if available
   if (persist_exists(MESSAGE_KEY_BG1)) {
@@ -38,19 +41,20 @@ void config_load(AppConfig *config) {
     config->hour.argb = persist_read_int(MESSAGE_KEY_HOUR);
   }
 
-  if (persist_exists(MESSAGE_KEY_MIN)) {
-    config->min.argb = persist_read_int(MESSAGE_KEY_MIN);
+  if (persist_exists(MESSAGE_KEY_MINUTE)) {
+    config->minute.argb = persist_read_int(MESSAGE_KEY_MINUTE);
   }
 }
 
 void config_save(AppConfig *config) {
+  persist_write_int(SETTINGS_VERSION_KEY, 1);
   persist_write_int(MESSAGE_KEY_BG1, config->bg1.argb);
   persist_write_int(MESSAGE_KEY_BG2, config->bg2.argb);
   persist_write_int(MESSAGE_KEY_DATE1, config->date1.argb);
   persist_write_int(MESSAGE_KEY_DATE2, config->date2.argb);
   persist_write_int(MESSAGE_KEY_DIGITS, config->digits.argb);
   persist_write_int(MESSAGE_KEY_HOUR, config->hour.argb);
-  persist_write_int(MESSAGE_KEY_MIN, config->min.argb);
+  persist_write_int(MESSAGE_KEY_MINUTE, config->minute.argb);
 }
 
 static void inbox_received_callback(DictionaryIterator *iter, void *context) {
@@ -60,7 +64,7 @@ static void inbox_received_callback(DictionaryIterator *iter, void *context) {
   Tuple *date2_t = dict_find(iter, MESSAGE_KEY_DATE2);
   Tuple *digits_t = dict_find(iter, MESSAGE_KEY_DIGITS);
   Tuple *hour_t = dict_find(iter, MESSAGE_KEY_HOUR);
-  Tuple *min_t = dict_find(iter, MESSAGE_KEY_MIN);
+  Tuple *minute_t = dict_find(iter, MESSAGE_KEY_MINUTE);
 
   if (bg1_t) {
     s_config->bg1 = GColorFromHEX(bg1_t->value->int32);
@@ -80,8 +84,8 @@ static void inbox_received_callback(DictionaryIterator *iter, void *context) {
   if (hour_t) {
     s_config->hour = GColorFromHEX(hour_t->value->int32);
   }
-  if (min_t) {
-    s_config->min = GColorFromHEX(min_t->value->int32);
+  if (minute_t) {
+    s_config->minute = GColorFromHEX(minute_t->value->int32);
   }
 
   config_save(s_config);

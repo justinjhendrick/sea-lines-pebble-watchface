@@ -31,7 +31,7 @@
       "DATE2",
       "DIGITS",
       "HOUR",
-      "MIN"
+      "MINUTE"
     ],
     "resources": {
       "media": []
