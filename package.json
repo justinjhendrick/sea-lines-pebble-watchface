@@ -36,7 +36,14 @@
       "MINUTE"
     ],
     "resources": {
-      "media": []
+      "media": [
+        {
+          "type": "bitmap",
+          "name": "MENU_ICON",
+          "file": "menu-icon.png",
+          "menuIcon": true
+        }
+      ]
     }
   }
 }
