@@ -10,25 +10,29 @@
         "type": "color",
         "defaultValue": "000055",
         "messageKey": "BG1",
-        "label": "Background"
+        "label": "Background",
+        "allowGray": true
       },
       {
         "type": "color",
         "defaultValue": "5555AA",
         "messageKey": "BG2",
-        "label": "Secondary Background"
+        "label": "Secondary Background",
+        "allowGray": true
       },
       {
         "type": "color",
         "defaultValue": "FFFFFF",
         "messageKey": "DATE1",
-        "label": "Day of the Week Background"
+        "label": "Day of the Week Background",
+        "allowGray": true
       },
       {
         "type": "color",
         "defaultValue": "FFFFAA",
         "messageKey": "DATE2",
-        "label": "Day of the Month Background"
+        "label": "Day of the Month Background",
+        "allowGray": true
       },
       {
         "type": "color",

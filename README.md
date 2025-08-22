@@ -6,6 +6,10 @@ Rebble App Store Link: https://apps.rebble.io/en_US/application/68354a1892baf200
 
 ## Screenshots
 
+### Aplite
+
+![screenshot](screenshot_aplite.png)
+
 ### Basalt
 
 ![screenshot](screenshot_basalt.png)
@@ -13,6 +17,10 @@ Rebble App Store Link: https://apps.rebble.io/en_US/application/68354a1892baf200
 ### Chalk
 
 ![screenshot](screenshot_chalk.png)
+
+### Diorite
+
+![screenshot](screenshot_diorite.png)
 
 ### Emery
 
