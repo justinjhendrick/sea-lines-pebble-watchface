@@ -21,7 +21,9 @@
       "basalt",
       "chalk",
       "diorite",
-      "emery"
+      "flint",
+      "emery",
+      "gabbro"
     ],
     "watchapp": {
       "watchface": true
