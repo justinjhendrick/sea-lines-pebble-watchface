@@ -6,9 +6,9 @@ Rebble App Store Link: https://apps.rebble.io/en_US/application/68354a1892baf200
 
 ## Screenshots
 
-### Aplite
+### Aplite, Diorite, Flint
 
-![screenshot](screenshot_aplite.png)
+![screenshot](screenshot_diorite.png)
 
 ### Basalt
 
@@ -18,13 +18,13 @@ Rebble App Store Link: https://apps.rebble.io/en_US/application/68354a1892baf200
 
 ![screenshot](screenshot_chalk.png)
 
-### Diorite
-
-![screenshot](screenshot_diorite.png)
-
 ### Emery
 
 ![screenshot](screenshot_emery.png)
+
+### Gabbro
+
+![screenshot](screenshot_gabbro.png)
 
 ## License
 
