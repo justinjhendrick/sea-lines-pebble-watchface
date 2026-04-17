@@ -9,14 +9,16 @@ THIS_DIR = Path(__file__).absolute().parent
 def main() -> int:
     with open(THIS_DIR / "package.json", mode="r") as f:
         package = json.load(f)
-    check_call(["rebble", "build"])
+    check_call(["pebble", "build"])
     for platform in package["pebble"]["targetPlatforms"]:
-        check_call(["rebble", "wipe"])
-        check_call(["rebble", "kill"])
-        check_call(["rebble", "install", "--emulator", platform])
-        check_call(["rebble", "screenshot", f"screenshot_{platform}.png"])
-    check_call(["rebble", "wipe"])
-    check_call(["rebble", "kill"])
+        check_call(["pebble", "wipe"])
+        check_call(["pebble", "kill"])
+        check_call(["pebble", "install", "--emulator", platform])
+        if platform in ("aplite", "flint"):
+            continue  # skip screenshot because identical to diorite
+        check_call(["pebble", "screenshot", f"screenshot_{platform}.png"])
+    check_call(["pebble", "wipe"])
+    check_call(["pebble", "kill"])
     return 0
 
 if __name__ == "__main__":
