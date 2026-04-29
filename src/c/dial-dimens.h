@@ -22,13 +22,13 @@
 /* --- Ticks --- */
 #if PBL_DISPLAY_WIDTH >= 260
     #define DIMEN_DATE_SIZE GSize(28, 30)
-    #define DIMEN_WDAY_SIZE GSize(38, 30)
+    #define DIMEN_WDAY_SIZE GSize(46, 30)
 
     #define DIMEN_TICK_TEXT_SIZE 26
     #define DIMEN_TICK_STROKE_WIDTH 5
 #elif PBL_DISPLAY_WIDTH >= 200
     #define DIMEN_DATE_SIZE GSize(28, 30)
-    #define DIMEN_WDAY_SIZE GSize(38, 30)
+    #define DIMEN_WDAY_SIZE GSize(46, 30)
 
     #define DIMEN_TICK_TEXT_SIZE 22
     #define DIMEN_TICK_STROKE_WIDTH 3
