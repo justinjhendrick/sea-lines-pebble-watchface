@@ -10,6 +10,7 @@ static Window* s_window;
 static Layer* s_layer;
 static char s_buffer[BUFFER_LEN];
 static AppConfig s_config;
+static TimeUnits s_time_units = MINUTE_UNIT;
 
 static void draw_bg(GContext* ctx, GRect bounds, GPoint center, int vcr) {
   int i = 0;
@@ -104,6 +105,55 @@ static void draw_minute(GContext* ctx, GRect bounds, GPoint center, int vcr, str
   graphics_fill_circle(ctx, center, DIMEN_MINUTE_BULB_RADIUS);
 }
 
+static void draw_second(GContext* ctx, GRect bounds, GPoint center, int vcr, struct tm* now) {
+  graphics_context_set_stroke_color(ctx, s_config.second);
+  graphics_context_set_fill_color(ctx, s_config.second);
+  int total_sec = 60;
+  int current_sec = now->tm_sec;
+  int angle = current_sec * TRIG_MAX_ANGLE / total_sec;
+  if (s_config.second_style == SECOND_STYLE_DOT) {
+    graphics_context_set_stroke_width(ctx, 1);
+    int radius = DIMEN_SECOND_DOT_RADIUS;
+    graphics_fill_circle(
+      ctx,
+      cartesian_from_polar_trigangle(center, vcr - DIMEN_TICK_TEXT_SIZE - radius * 2 - 1, angle),
+      radius
+    );
+  } else if (s_config.second_style == SECOND_STYLE_HAND) {
+    graphics_context_set_stroke_width(ctx, DIMEN_SECOND_STROKE_WIDTH);
+    graphics_draw_line(
+      ctx,
+      cartesian_from_polar_trigangle(center, DIMEN_SECOND_TAIL_LENGTH, angle),
+      cartesian_from_polar_trigangle(center, 9 * vcr / 10, angle)
+    );
+    graphics_fill_circle(ctx, center, DIMEN_SECOND_BULB_RADIUS);
+  }
+}
+
+static void tick_handler(struct tm* now, TimeUnits units_changed) {
+  if (s_config.update_rate == UPDATE_RATE_5SECOND && now->tm_sec % 5 != 0) {
+    // skip redrawing the screen to save battery
+  } else {
+    layer_mark_dirty(window_get_root_layer(s_window));
+  }
+}
+
+static void tick_resub() {
+  if (
+    s_config.update_rate == UPDATE_RATE_MINUTE
+    && s_time_units != MINUTE_UNIT
+  ) {
+    s_time_units = MINUTE_UNIT;
+    tick_timer_service_subscribe(s_time_units, tick_handler);
+  } else if (
+    (s_config.update_rate == UPDATE_RATE_1SECOND || s_config.update_rate == UPDATE_RATE_5SECOND)
+    && s_time_units != SECOND_UNIT
+  ) {
+    s_time_units = SECOND_UNIT;
+    tick_timer_service_subscribe(s_time_units, tick_handler);
+  }
+}
+
 static void update_layer(Layer* layer, GContext* ctx) {
   time_t temp = time(NULL);
   struct tm* now = localtime(&temp);
@@ -118,6 +168,9 @@ static void update_layer(Layer* layer, GContext* ctx) {
   draw_ticks(ctx, bounds, center, vcr, now);
   draw_hour(ctx, bounds, center, vcr, now);
   draw_minute(ctx, bounds, center, vcr, now);
+  draw_second(ctx, bounds, center, vcr, now);
+
+  tick_resub();
 }
 
 static void window_load(Window* window) {
@@ -133,10 +186,6 @@ static void window_unload(Window* window) {
   layer_destroy(s_layer);
 }
 
-static void tick_handler(struct tm* now, TimeUnits units_changed) {
-  layer_mark_dirty(window_get_root_layer(s_window));
-}
-
 static void init(void) {
   config_load(&s_config);
   s_window = window_create();
@@ -145,7 +194,8 @@ static void init(void) {
     .unload = window_unload,
   });
   window_stack_push(s_window, true);
-  tick_timer_service_subscribe(DEBUG_TIME ? SECOND_UNIT : MINUTE_UNIT, tick_handler);
+  tick_timer_service_subscribe(s_time_units, tick_handler);
+  tick_resub();
   messaging_init(&s_config, window_get_root_layer(s_window));
 }
 

@@ -2,6 +2,16 @@
 
 #include <pebble.h>
 
+// Manually make sure clay config stays in sync
+#define SECOND_STYLE_NONE ('N')
+#define SECOND_STYLE_DOT ('D')
+#define SECOND_STYLE_HAND ('H')
+
+#define UPDATE_RATE_MINUTE ('M')
+#define UPDATE_RATE_1SECOND ('1')
+#define UPDATE_RATE_5SECOND ('5')
+#define UPDATE_RATE_UNKNOWN ('U')
+
 typedef struct {
   GColor bg1;
   GColor bg2;
@@ -10,6 +20,9 @@ typedef struct {
   GColor digits;
   GColor hour;
   GColor minute;
+  GColor second;
+  char second_style;
+  char update_rate;
 } AppConfig;
 
 void config_load(AppConfig *config);
