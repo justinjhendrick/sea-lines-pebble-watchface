@@ -10,7 +10,6 @@
 #define UPDATE_RATE_MINUTE ('M')
 #define UPDATE_RATE_1SECOND ('1')
 #define UPDATE_RATE_5SECOND ('5')
-#define UPDATE_RATE_UNKNOWN ('U')
 
 typedef struct {
   GColor bg1;
