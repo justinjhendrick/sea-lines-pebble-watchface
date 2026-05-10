@@ -1,13 +1,14 @@
 #include "config.h"
 
+// If we need a non-backwards compatible version of settings
+// check SETTINGS_VERSION_KEY and migrate
 #define SETTINGS_VERSION_KEY 1
 
 static AppConfig *s_config;
 static Layer *s_layer;
 
 void config_load(AppConfig *config) {
-  // If we need a new version of settings, check SETTINGS_VERSION_KEY and migrate
-  // Set default colors
+  // default settings, in case the keys don't exist
   config->bg1 = GColorOxfordBlue;
   config->bg2 = GColorLiberty;
   config->date1 = GColorWhite;
@@ -15,6 +16,9 @@ void config_load(AppConfig *config) {
   config->digits = GColorPastelYellow;
   config->hour = GColorCeleste;
   config->minute = GColorRajah;
+  config->second = GColorPastelYellow;
+  config->second_style = SECOND_STYLE_NONE;
+  config->update_rate = UPDATE_RATE_MINUTE;
 
   // Load colors from storage if available
   if (persist_exists(MESSAGE_KEY_BG1)) {
@@ -44,6 +48,18 @@ void config_load(AppConfig *config) {
   if (persist_exists(MESSAGE_KEY_MINUTE)) {
     config->minute.argb = persist_read_int(MESSAGE_KEY_MINUTE);
   }
+
+  if (persist_exists(MESSAGE_KEY_SECOND)) {
+    config->second.argb = persist_read_int(MESSAGE_KEY_SECOND);
+  }
+
+  if (persist_exists(MESSAGE_KEY_SECOND_STYLE)) {
+    config->second_style = persist_read_int(MESSAGE_KEY_SECOND_STYLE);
+  }
+
+  if (persist_exists(MESSAGE_KEY_UPDATE_RATE)) {
+    config->update_rate = persist_read_int(MESSAGE_KEY_UPDATE_RATE);
+  }
 }
 
 void config_save(AppConfig *config) {
@@ -55,37 +71,52 @@ void config_save(AppConfig *config) {
   persist_write_int(MESSAGE_KEY_DIGITS, config->digits.argb);
   persist_write_int(MESSAGE_KEY_HOUR, config->hour.argb);
   persist_write_int(MESSAGE_KEY_MINUTE, config->minute.argb);
+  persist_write_int(MESSAGE_KEY_SECOND, config->second.argb);
+  persist_write_int(MESSAGE_KEY_SECOND_STYLE, config->second_style);
+  persist_write_int(MESSAGE_KEY_UPDATE_RATE, config->update_rate);
 }
 
 static void inbox_received_callback(DictionaryIterator *iter, void *context) {
-  Tuple *bg1_t = dict_find(iter, MESSAGE_KEY_BG1);
-  Tuple *bg2_t = dict_find(iter, MESSAGE_KEY_BG2);
-  Tuple *date1_t = dict_find(iter, MESSAGE_KEY_DATE1);
-  Tuple *date2_t = dict_find(iter, MESSAGE_KEY_DATE2);
-  Tuple *digits_t = dict_find(iter, MESSAGE_KEY_DIGITS);
-  Tuple *hour_t = dict_find(iter, MESSAGE_KEY_HOUR);
-  Tuple *minute_t = dict_find(iter, MESSAGE_KEY_MINUTE);
+  Tuple* bg1 = dict_find(iter, MESSAGE_KEY_BG1);
+  Tuple* bg2 = dict_find(iter, MESSAGE_KEY_BG2);
+  Tuple* date1 = dict_find(iter, MESSAGE_KEY_DATE1);
+  Tuple* date2 = dict_find(iter, MESSAGE_KEY_DATE2);
+  Tuple* digits = dict_find(iter, MESSAGE_KEY_DIGITS);
+  Tuple* hour = dict_find(iter, MESSAGE_KEY_HOUR);
+  Tuple* minute = dict_find(iter, MESSAGE_KEY_MINUTE);
+  Tuple* second = dict_find(iter, MESSAGE_KEY_SECOND);
+  Tuple* second_style = dict_find(iter, MESSAGE_KEY_SECOND_STYLE);
+  Tuple* update_rate = dict_find(iter, MESSAGE_KEY_UPDATE_RATE);
 
-  if (bg1_t) {
-    s_config->bg1 = GColorFromHEX(bg1_t->value->int32);
+  if (bg1) {
+    s_config->bg1 = GColorFromHEX(bg1->value->int32);
   }
-  if (bg2_t) {
-    s_config->bg2 = GColorFromHEX(bg2_t->value->int32);
+  if (bg2) {
+    s_config->bg2 = GColorFromHEX(bg2->value->int32);
   }
-  if (date1_t) {
-    s_config->date1 = GColorFromHEX(date1_t->value->int32);
+  if (date1) {
+    s_config->date1 = GColorFromHEX(date1->value->int32);
   }
-  if (date2_t) {
-    s_config->date2 = GColorFromHEX(date2_t->value->int32);
+  if (date2) {
+    s_config->date2 = GColorFromHEX(date2->value->int32);
   }
-  if (digits_t) {
-    s_config->digits = GColorFromHEX(digits_t->value->int32);
+  if (digits) {
+    s_config->digits = GColorFromHEX(digits->value->int32);
   }
-  if (hour_t) {
-    s_config->hour = GColorFromHEX(hour_t->value->int32);
+  if (hour) {
+    s_config->hour = GColorFromHEX(hour->value->int32);
   }
-  if (minute_t) {
-    s_config->minute = GColorFromHEX(minute_t->value->int32);
+  if (minute) {
+    s_config->minute = GColorFromHEX(minute->value->int32);
+  }
+  if (second) {
+    s_config->second = GColorFromHEX(second->value->int32);
+  }
+  if (second_style) {
+    s_config->second_style = second_style->value->cstring[0];
+  }
+  if (update_rate) {
+    s_config->update_rate = update_rate->value->cstring[0];
   }
 
   config_save(s_config);

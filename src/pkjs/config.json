@@ -2,9 +2,9 @@
   {
     "type": "section",
     "items": [
-      { 
-        "type": "heading", 
-        "defaultValue": "Watchface Customization" 
+      {
+        "type": "heading",
+        "defaultValue": "Colors"
       },
       {
         "type": "color",
@@ -44,13 +44,68 @@
         "type": "color",
         "defaultValue": "AAFFFF",
         "messageKey": "HOUR",
-        "label": "Hours Hand"
+        "label": "Hour Hand"
       },
       {
         "type": "color",
         "defaultValue": "FFAA55",
         "messageKey": "MINUTE",
-        "label": "Minutes Hand"
+        "label": "Minute Hand"
+      },
+      {
+        "type": "color",
+        "defaultValue": "FFFFAA",
+        "messageKey": "SECOND",
+        "label": "Second Color"
+      }
+    ]
+  },
+  {
+    "type": "section",
+    "items": [
+      {
+        "type": "heading",
+        "defaultValue": "Behavior"
+      },
+      {
+        "type": "select",
+        "messageKey": "SECOND_STYLE",
+        "defaultValue": "N",
+        "label": "Second Style",
+        "options": [
+          {
+            "label": "None",
+            "value": "N"
+          },
+          {
+            "label": "Dot",
+            "value": "D"
+          },
+          {
+            "label": "Hand",
+            "value": "H"
+          }
+        ]
+      },
+      {
+        "type": "select",
+        "messageKey": "UPDATE_RATE",
+        "defaultValue": "M",
+        "label": "Update Rate",
+        "options": [
+          {
+            "label": "Per Minute",
+            "value": "M"
+          },
+          {
+            "label": "Per Second",
+            "value": "1"
+          },
+          {
+            "label": "Per 5 Seconds",
+            "value": "5"
+          }
+        ]
       }
     ]
   },

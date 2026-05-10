@@ -1,10 +1,12 @@
 {
   "name": "sea-lines",
   "author": "justinjhendrick, lavglaab",
-  "version": "1.6.0",
+  "version": "1.7.0",
   "keywords": [
     "pebble-watchface",
     "analog",
+    "swatch",
+    "configurable",
     "colorful"
   ],
   "private": false,
@@ -35,7 +37,10 @@
       "DATE2",
       "DIGITS",
       "HOUR",
-      "MINUTE"
+      "MINUTE",
+      "SECOND",
+      "SECOND_STYLE",
+      "UPDATE_RATE"
     ],
     "resources": {
       "media": [
