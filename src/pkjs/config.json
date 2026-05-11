@@ -90,13 +90,9 @@
       {
         "type": "select",
         "messageKey": "UPDATE_RATE",
-        "defaultValue": "M",
-        "label": "Update Rate",
+        "defaultValue": "1",
+        "label": "Second Hand/Dot Update Rate",
         "options": [
-          {
-            "label": "Per Minute",
-            "value": "M"
-          },
           {
             "label": "Per Second",
             "value": "1"

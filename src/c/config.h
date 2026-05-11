@@ -7,7 +7,10 @@
 #define SECOND_STYLE_DOT ('D')
 #define SECOND_STYLE_HAND ('H')
 
-#define UPDATE_RATE_MINUTE ('M')
+// We don't need an explicit UPDATE_RATE_MINUTE because
+// that's the same as SECOND_STYLE_NONE.
+// We'll ignore the update rate confit (and update once per minute)
+// when there is no second hand/dot.
 #define UPDATE_RATE_1SECOND ('1')
 #define UPDATE_RATE_5SECOND ('5')
 
