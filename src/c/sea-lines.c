@@ -139,16 +139,13 @@ static void tick_handler(struct tm* now, TimeUnits units_changed) {
 }
 
 static void tick_resub() {
-  if (
-    s_config.update_rate == UPDATE_RATE_MINUTE
-    && s_time_units != MINUTE_UNIT
-  ) {
+  if (s_config.second_style == SECOND_STYLE_NONE && s_time_units != MINUTE_UNIT) {
+    // ignore update rate if there is no second hand/dot
     s_time_units = MINUTE_UNIT;
     tick_timer_service_subscribe(s_time_units, tick_handler);
-  } else if (
-    (s_config.update_rate == UPDATE_RATE_1SECOND || s_config.update_rate == UPDATE_RATE_5SECOND)
-    && s_time_units != SECOND_UNIT
-  ) {
+  } else if (s_time_units != SECOND_UNIT) {
+    // tick timer only offers per second or per minute.
+    // So we use per-second and skip some redraws when in per-5-second mode.
     s_time_units = SECOND_UNIT;
     tick_timer_service_subscribe(s_time_units, tick_handler);
   }

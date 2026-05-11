@@ -18,7 +18,7 @@ void config_load(AppConfig *config) {
   config->minute = GColorRajah;
   config->second = GColorPastelYellow;
   config->second_style = SECOND_STYLE_NONE;
-  config->update_rate = UPDATE_RATE_MINUTE;
+  config->update_rate = UPDATE_RATE_1SECOND;
 
   // Load colors from storage if available
   if (persist_exists(MESSAGE_KEY_BG1)) {
