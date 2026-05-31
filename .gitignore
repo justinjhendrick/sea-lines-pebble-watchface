@@ -2,3 +2,4 @@ build/
 .vscode
 .lock-waf_*
 node_modules/
+*.swp
