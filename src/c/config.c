@@ -7,6 +7,11 @@
 static AppConfig *s_config;
 static Layer *s_layer;
 
+static void refresh_derived_colors(AppConfig *config) {
+  config->date1_text = gcolor_legible_over(config->date1);
+  config->date2_text = gcolor_legible_over(config->date2);
+}
+
 void config_load(AppConfig *config) {
   // default settings, in case the keys don't exist
   config->bg1 = GColorOxfordBlue;
@@ -60,6 +65,8 @@ void config_load(AppConfig *config) {
   if (persist_exists(MESSAGE_KEY_UPDATE_RATE)) {
     config->update_rate = persist_read_int(MESSAGE_KEY_UPDATE_RATE);
   }
+
+  refresh_derived_colors(config);
 }
 
 void config_save(AppConfig *config) {
@@ -119,6 +126,7 @@ static void inbox_received_callback(DictionaryIterator *iter, void *context) {
     s_config->update_rate = update_rate->value->cstring[0];
   }
 
+  refresh_derived_colors(s_config);
   config_save(s_config);
 
   on_config_changed();

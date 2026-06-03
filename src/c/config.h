@@ -19,6 +19,8 @@ typedef struct {
   GColor bg2;
   GColor date1;
   GColor date2;
+  GColor date1_text;
+  GColor date2_text;
   GColor digits;
   GColor hour;
   GColor minute;

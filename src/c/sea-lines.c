@@ -8,9 +8,12 @@
 
 static Window* s_window;
 static Layer* s_layer;
-static char s_buffer[BUFFER_LEN];
 static AppConfig s_config;
 static TimeUnits s_time_units = MINUTE_UNIT;
+
+static char s_day_buffer[BUFFER_LEN];
+static char s_wday_buffer[BUFFER_LEN];
+static int s_cached_yday = -1;
 
 static void draw_bg(GContext* ctx, GRect bounds, GPoint center, int vcr) {
   int i = 0;
@@ -31,12 +34,23 @@ static void draw_bg(GContext* ctx, GRect bounds, GPoint center, int vcr) {
   }
 }
 
+static void refresh_day_cache(struct tm* now) {
+  if (now->tm_yday == s_cached_yday) {
+    return;
+  }
+  s_cached_yday = now->tm_yday;
+  format_day(s_day_buffer, BUFFER_LEN, now);
+  format_day_of_week(s_wday_buffer, BUFFER_LEN, now);
+}
+
 static void draw_ticks(GContext* ctx, GRect bounds, GPoint center, int vcr, struct tm* now) {
+  refresh_day_cache(now);
+
   for (int hour = 0; hour < 12; hour++) {
     int angle = hour * TRIG_MAX_ANGLE / 12;
     if (hour == 3) {
       // date of month
-      graphics_context_set_text_color(ctx, gcolor_legible_over(s_config.date2));
+      graphics_context_set_text_color(ctx, s_config.date2_text);
       graphics_context_set_fill_color(ctx, s_config.date2);
       GSize date_size = DIMEN_DATE_SIZE;
       GRect date_bbox = rect_from_midpoint(
@@ -44,11 +58,10 @@ static void draw_ticks(GContext* ctx, GRect bounds, GPoint center, int vcr, stru
         date_size
       );
       graphics_fill_rect(ctx, date_bbox, 0, GCornerNone);
-      format_day(s_buffer, BUFFER_LEN, now);
-      draw_text_midalign(ctx, s_buffer, date_bbox, GTextAlignmentCenter, true);
+      draw_text_midalign(ctx, s_day_buffer, date_bbox, GTextAlignmentCenter, true);
 
       // day of week
-      graphics_context_set_text_color(ctx, gcolor_legible_over(s_config.date1));
+      graphics_context_set_text_color(ctx, s_config.date1_text);
       graphics_context_set_fill_color(ctx, s_config.date1);
       GSize wday_size = DIMEN_WDAY_SIZE;
       GRect wday_bbox = rect_from_midpoint(
@@ -56,8 +69,7 @@ static void draw_ticks(GContext* ctx, GRect bounds, GPoint center, int vcr, stru
         wday_size
       );
       graphics_fill_rect(ctx, wday_bbox, 0, GCornerNone);
-      format_day_of_week(s_buffer, BUFFER_LEN, now);
-      draw_text_midalign(ctx, s_buffer, wday_bbox, GTextAlignmentCenter, false);
+      draw_text_midalign(ctx, s_wday_buffer, wday_bbox, GTextAlignmentCenter, false);
     } else {
       graphics_context_set_stroke_color(ctx, s_config.digits);
       graphics_context_set_stroke_width(ctx, DIMEN_TICK_STROKE_WIDTH);
