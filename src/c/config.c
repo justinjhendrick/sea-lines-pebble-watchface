@@ -121,7 +121,7 @@ static void inbox_received_callback(DictionaryIterator *iter, void *context) {
 
   config_save(s_config);
 
-  layer_mark_dirty(s_layer);
+  on_config_changed();
 }
 
 void messaging_init(AppConfig *config, Layer *layer) {

@@ -139,17 +139,16 @@ static void tick_handler(struct tm* now, TimeUnits units_changed) {
 }
 
 static void tick_resub() {
-  if (s_config.second_style == SECOND_STYLE_NONE && s_time_units != MINUTE_UNIT) {
-    // ignore update rate if there is no second hand/dot
-    s_time_units = MINUTE_UNIT;
+  TimeUnits needed = (s_config.second_style == SECOND_STYLE_NONE) ? MINUTE_UNIT : SECOND_UNIT;
+  if (needed != s_time_units) {
+    s_time_units = needed;
     tick_timer_service_subscribe(s_time_units, tick_handler);
   }
-  if (s_config.second_style != SECOND_STYLE_NONE && s_time_units != SECOND_UNIT) {
-    // tick timer only offers per second or per minute.
-    // So we use per-second and skip some redraws when in per-5-second mode.
-    s_time_units = SECOND_UNIT;
-    tick_timer_service_subscribe(s_time_units, tick_handler);
-  }
+}
+
+void on_config_changed() {
+  tick_resub();
+  layer_mark_dirty(window_get_root_layer(s_window));
 }
 
 static void update_layer(Layer* layer, GContext* ctx) {
@@ -166,9 +165,9 @@ static void update_layer(Layer* layer, GContext* ctx) {
   draw_ticks(ctx, bounds, center, vcr, now);
   draw_hour(ctx, bounds, center, vcr, now);
   draw_minute(ctx, bounds, center, vcr, now);
-  draw_second(ctx, bounds, center, vcr, now);
-
-  tick_resub();
+  if (s_config.second_style != SECOND_STYLE_NONE) {
+    draw_second(ctx, bounds, center, vcr, now);
+  }
 }
 
 static void window_load(Window* window) {
