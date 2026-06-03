@@ -167,6 +167,8 @@ static void tick_resub() {
 }
 
 void on_config_changed() {
+  time_t temp = time(NULL);
+  s_now = *localtime(&temp);
   tick_resub();
   s_cached_yday = -1;
   if (s_bg_layer) layer_mark_dirty(s_bg_layer);
