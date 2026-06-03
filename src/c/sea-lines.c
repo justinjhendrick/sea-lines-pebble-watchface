@@ -157,6 +157,10 @@ static void tick_handler(struct tm* now, TimeUnits units_changed) {
 }
 
 static void tick_resub() {
+  // tick timer only offers per second or per minute, so when the
+  // second hand is disabled we subscribe per-minute (ignoring the
+  // update rate config), and when it's enabled we subscribe per-second
+  // and skip some redraws in the tick handler for 5-second mode.
   TimeUnits needed = (s_config.second_style == SECOND_STYLE_NONE) ? MINUTE_UNIT : SECOND_UNIT;
   if (needed != s_time_units) {
     s_time_units = needed;
