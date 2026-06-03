@@ -16,6 +16,10 @@ static char s_day_buffer[BUFFER_LEN];
 static char s_wday_buffer[BUFFER_LEN];
 static int s_cached_yday = -1;
 
+static struct tm s_now;
+static GPoint s_cached_center;
+static int s_cached_vcr = 0;
+
 static void draw_bg(GContext* ctx, GRect bounds, GPoint center, int vcr) {
   int i = 0;
   int width = DIMEN_BG_STRIPE_WIDTH;
@@ -144,6 +148,7 @@ static void draw_second(GContext* ctx, GRect bounds, GPoint center, int vcr, str
 }
 
 static void tick_handler(struct tm* now, TimeUnits units_changed) {
+  s_now = *now;
   if (s_config.update_rate == UPDATE_RATE_5SECOND && now->tm_sec % 5 != 0) {
     // skip redrawing the screen to save battery
   } else {
@@ -167,33 +172,28 @@ void on_config_changed() {
 }
 
 static void bg_update_proc(Layer* layer, GContext* ctx) {
-  time_t temp = time(NULL);
-  struct tm* now = localtime(&temp);
+  struct tm* now = &s_now;
   if (DEBUG_TIME) {
     fast_forward_time(now);
   }
 
   GRect bounds = layer_get_unobstructed_bounds(layer);
-  int vcr = min(bounds.size.h, bounds.size.w) / 2 - DIMEN_VCR_INSET;
-  GPoint center = grect_center_point(&bounds);
-  draw_bg(ctx, bounds, center, vcr);
-  draw_ticks(ctx, bounds, center, vcr, now);
+  s_cached_vcr = min(bounds.size.h, bounds.size.w) / 2 - DIMEN_VCR_INSET;
+  s_cached_center = grect_center_point(&bounds);
+  draw_bg(ctx, bounds, s_cached_center, s_cached_vcr);
+  draw_ticks(ctx, bounds, s_cached_center, s_cached_vcr, now);
 }
 
 static void hands_update_proc(Layer* layer, GContext* ctx) {
-  time_t temp = time(NULL);
-  struct tm* now = localtime(&temp);
+  struct tm* now = &s_now;
   if (DEBUG_TIME) {
     fast_forward_time(now);
   }
 
-  GRect bounds = layer_get_unobstructed_bounds(layer);
-  int vcr = min(bounds.size.h, bounds.size.w) / 2 - DIMEN_VCR_INSET;
-  GPoint center = grect_center_point(&bounds);
-  draw_hour(ctx, bounds, center, vcr, now);
-  draw_minute(ctx, bounds, center, vcr, now);
+  draw_hour(ctx, (GRect) {0}, s_cached_center, s_cached_vcr, now);
+  draw_minute(ctx, (GRect) {0}, s_cached_center, s_cached_vcr, now);
   if (s_config.second_style != SECOND_STYLE_NONE) {
-    draw_second(ctx, bounds, center, vcr, now);
+    draw_second(ctx, (GRect) {0}, s_cached_center, s_cached_vcr, now);
   }
 }
 
@@ -232,6 +232,8 @@ static void window_unload(Window* window) {
 
 static void init(void) {
   config_load(&s_config);
+  time_t temp = time(NULL);
+  s_now = *localtime(&temp);
   s_window = window_create();
   window_set_window_handlers(s_window, (WindowHandlers) {
     .load = window_load,
