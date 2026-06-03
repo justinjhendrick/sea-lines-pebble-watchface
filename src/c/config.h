@@ -31,4 +31,5 @@ void config_load(AppConfig *config);
 void config_save(AppConfig *config);
 void messaging_init(AppConfig *config, Layer *layer);
 void messaging_deinit();
+void on_config_changed();
 
