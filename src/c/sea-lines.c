@@ -152,7 +152,7 @@ static void tick_handler(struct tm* now, TimeUnits units_changed) {
   if (s_config.update_rate == UPDATE_RATE_5SECOND && now->tm_sec % 5 != 0) {
     // skip redrawing the screen to save battery
   } else {
-    layer_mark_dirty(s_hands_layer);
+    if (s_hands_layer) layer_mark_dirty(s_hands_layer);
   }
 }
 
@@ -167,8 +167,8 @@ static void tick_resub() {
 void on_config_changed() {
   tick_resub();
   s_cached_yday = -1;
-  layer_mark_dirty(s_bg_layer);
-  layer_mark_dirty(s_hands_layer);
+  if (s_bg_layer) layer_mark_dirty(s_bg_layer);
+  if (s_hands_layer) layer_mark_dirty(s_hands_layer);
 }
 
 static void bg_update_proc(Layer* layer, GContext* ctx) {
@@ -198,8 +198,8 @@ static void hands_update_proc(Layer* layer, GContext* ctx) {
 }
 
 static void unobstructed_change_handler(AnimationProgress progress, void *context) {
-  layer_mark_dirty(s_bg_layer);
-  layer_mark_dirty(s_hands_layer);
+  if (s_bg_layer) layer_mark_dirty(s_bg_layer);
+  if (s_hands_layer) layer_mark_dirty(s_hands_layer);
 }
 
 static void window_load(Window* window) {
@@ -220,14 +220,20 @@ static void window_load(Window* window) {
   };
   unobstructed_area_service_subscribe(handlers, NULL);
 
-  layer_mark_dirty(s_bg_layer);
-  layer_mark_dirty(s_hands_layer);
+  if (s_bg_layer) layer_mark_dirty(s_bg_layer);
+  if (s_hands_layer) layer_mark_dirty(s_hands_layer);
 }
 
 static void window_unload(Window* window) {
   unobstructed_area_service_unsubscribe();
-  layer_destroy(s_hands_layer);
-  layer_destroy(s_bg_layer);
+  if (s_hands_layer) {
+    layer_destroy(s_hands_layer);
+    s_hands_layer = NULL;
+  }
+  if (s_bg_layer) {
+    layer_destroy(s_bg_layer);
+    s_bg_layer = NULL;
+  }
 }
 
 static void init(void) {
