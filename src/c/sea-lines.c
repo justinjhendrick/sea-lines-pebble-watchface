@@ -7,7 +7,8 @@
 #define BUFFER_LEN (10)
 
 static Window* s_window;
-static Layer* s_layer;
+static Layer* s_bg_layer;
+static Layer* s_hands_layer;
 static AppConfig s_config;
 static TimeUnits s_time_units = MINUTE_UNIT;
 
@@ -146,7 +147,7 @@ static void tick_handler(struct tm* now, TimeUnits units_changed) {
   if (s_config.update_rate == UPDATE_RATE_5SECOND && now->tm_sec % 5 != 0) {
     // skip redrawing the screen to save battery
   } else {
-    layer_mark_dirty(window_get_root_layer(s_window));
+    layer_mark_dirty(s_hands_layer);
   }
 }
 
@@ -160,10 +161,12 @@ static void tick_resub() {
 
 void on_config_changed() {
   tick_resub();
-  layer_mark_dirty(window_get_root_layer(s_window));
+  s_cached_yday = -1;
+  layer_mark_dirty(s_bg_layer);
+  layer_mark_dirty(s_hands_layer);
 }
 
-static void update_layer(Layer* layer, GContext* ctx) {
+static void bg_update_proc(Layer* layer, GContext* ctx) {
   time_t temp = time(NULL);
   struct tm* now = localtime(&temp);
   if (DEBUG_TIME) {
@@ -175,6 +178,18 @@ static void update_layer(Layer* layer, GContext* ctx) {
   GPoint center = grect_center_point(&bounds);
   draw_bg(ctx, bounds, center, vcr);
   draw_ticks(ctx, bounds, center, vcr, now);
+}
+
+static void hands_update_proc(Layer* layer, GContext* ctx) {
+  time_t temp = time(NULL);
+  struct tm* now = localtime(&temp);
+  if (DEBUG_TIME) {
+    fast_forward_time(now);
+  }
+
+  GRect bounds = layer_get_unobstructed_bounds(layer);
+  int vcr = min(bounds.size.h, bounds.size.w) / 2 - DIMEN_VCR_INSET;
+  GPoint center = grect_center_point(&bounds);
   draw_hour(ctx, bounds, center, vcr, now);
   draw_minute(ctx, bounds, center, vcr, now);
   if (s_config.second_style != SECOND_STYLE_NONE) {
@@ -182,17 +197,37 @@ static void update_layer(Layer* layer, GContext* ctx) {
   }
 }
 
+static void unobstructed_change_handler(AnimationProgress progress, void *context) {
+  layer_mark_dirty(s_bg_layer);
+  layer_mark_dirty(s_hands_layer);
+}
+
 static void window_load(Window* window) {
   Layer* window_layer = window_get_root_layer(window);
   GRect bounds = layer_get_bounds(window_layer);
   window_set_background_color(s_window, s_config.bg1);
-  s_layer = layer_create(bounds);
-  layer_set_update_proc(s_layer, update_layer);
-  layer_add_child(window_layer, s_layer);
+
+  s_bg_layer = layer_create(bounds);
+  layer_set_update_proc(s_bg_layer, bg_update_proc);
+  layer_add_child(window_layer, s_bg_layer);
+
+  s_hands_layer = layer_create(bounds);
+  layer_set_update_proc(s_hands_layer, hands_update_proc);
+  layer_add_child(window_layer, s_hands_layer);
+
+  UnobstructedAreaHandlers handlers = {
+    .change = unobstructed_change_handler,
+  };
+  unobstructed_area_service_subscribe(handlers, NULL);
+
+  layer_mark_dirty(s_bg_layer);
+  layer_mark_dirty(s_hands_layer);
 }
 
 static void window_unload(Window* window) {
-  layer_destroy(s_layer);
+  unobstructed_area_service_unsubscribe();
+  layer_destroy(s_hands_layer);
+  layer_destroy(s_bg_layer);
 }
 
 static void init(void) {
